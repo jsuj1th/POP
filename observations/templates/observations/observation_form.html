@@ -1,0 +1,76 @@
+{% extends "observations/base.html" %}
+
+{% block topnav %}
+<div class="gold-bar" style="display:flex; justify-content:space-between; align-items:center; padding: 8px 24px;">
+  <div>
+    <a href="{% url 'select_data' %}">Return to Main Screen</a>
+    <a href="{% url 'logout' %}">Log Out</a>
+  </div>
+  <form method="post" action="{% url 'observation_form' %}?school_id={{ school_id }}&teacher_id={{ teacher_id }}" id="complete-form" aria-label="End observation session">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="complete">
+    <button type="button" class="complete-nav-btn" onclick="confirmComplete()" aria-label="Mark observation session as completed and go to download">
+      &#10003; Mark as Completed
+    </button>
+  </form>
+</div>
+{% endblock %}
+
+{% block page_title %}TEACHER BILINGUAL OBSERVATION PROTOCOL{% endblock %}
+
+{% block content %}
+<div class="obs-info" role="region" aria-label="Session information">
+  <span><strong>School:</strong> {{ school.name }}</span>
+  <span><strong>Teacher:</strong> {{ teacher.name }}</span>
+  <span><strong>Teacher ID:</strong> {{ teacher.teacher_id }}</span>
+  <span><strong>Observation:</strong> #{{ observation_number }}</span>
+</div>
+
+<main>
+  <form method="post"
+        action="{% url 'observation_form' %}?school_id={{ school_id }}&teacher_id={{ teacher_id }}{% if from_reports %}&from=reports{% endif %}"
+        id="obs-form"
+        aria-label="Observation entry form">
+    {% csrf_token %}
+    <div class="obs-panel" role="group" aria-labelledby="obs-panel-title">
+      <div class="obs-panel-header" id="obs-panel-title">START OBSERVATION</div>
+      <div class="obs-panel-body">
+
+        {% for field in form %}
+        <div class="obs-form-row">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          <div class="select-wrapper">
+            {{ field }}
+          </div>
+        </div>
+        {% if field.errors %}
+          <div class="field-error" role="alert" aria-live="polite">
+            {% for error in field.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+        {% endfor %}
+
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 18px;">
+      <button type="submit" name="action" value="enter" class="enter-btn" aria-label="Save observation {{ observation_number }} and continue to next">
+        E N T E R
+      </button>
+    </div>
+  </form>
+</main>
+
+<script>
+function confirmComplete() {
+  if (confirm("End this observation session?\n\nThe current (unsaved) form will be discarded. All previously saved observations will be kept.")) {
+    document.getElementById('complete-form').submit();
+  }
+}
+</script>
+{% endblock %}
+
+{% block footer %}
+  <a href="{% url 'select_data' %}">Return to Main Screen</a>
+  <a href="{% url 'logout' %}">Log Out</a>
+{% endblock %}

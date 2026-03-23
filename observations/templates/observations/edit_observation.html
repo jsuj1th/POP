@@ -1,0 +1,58 @@
+{% extends "observations/base.html" %}
+
+{% block topnav %}
+<div class="gold-bar">
+  <a href="{% url 'reports' %}">&#8592; Back to History</a>
+  <a href="{% url 'select_data' %}">Main Screen</a>
+  <a href="{% url 'logout' %}">Log Out</a>
+</div>
+{% endblock %}
+
+{% block page_title %}EDIT OBSERVATION{% endblock %}
+
+{% block content %}
+<div class="obs-info" role="region" aria-label="Observation context">
+  <span><strong>School:</strong> {{ obs.school.name }}</span>
+  <span><strong>Teacher:</strong> {{ obs.teacher.name }}</span>
+  <span><strong>Teacher ID:</strong> {{ obs.teacher.teacher_id }}</span>
+  <span><strong>Observation:</strong> #{{ obs.observation_number }}</span>
+  <span><strong>Recorded:</strong> {{ obs.created_at|date:"Y-m-d H:i" }}</span>
+</div>
+
+<form method="post" aria-label="Edit observation form">
+  {% csrf_token %}
+  <div class="obs-panel" role="group" aria-labelledby="edit-panel-title">
+    <div class="obs-panel-header" id="edit-panel-title">EDIT OBSERVATION #{{ obs.observation_number }}</div>
+    <div class="obs-panel-body">
+
+      {% for field in form %}
+      <div class="obs-form-row">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        <div class="select-wrapper">{{ field }}</div>
+      </div>
+      {% if field.errors %}
+        <div class="field-error" role="alert">
+          {% for error in field.errors %}{{ error }}{% endfor %}
+        </div>
+      {% endif %}
+      {% endfor %}
+
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:18px; display:flex; justify-content:center; gap:16px;">
+    <button type="submit" class="enter-btn" aria-label="Save changes to this observation">
+      S A V E
+    </button>
+    <a href="{% url 'reports' %}" class="enter-btn" style="text-decoration:none; line-height:1.6;" aria-label="Discard changes and go back">
+      C A N C E L
+    </a>
+  </div>
+</form>
+{% endblock %}
+
+{% block footer %}
+  <a href="{% url 'reports' %}">Back to History</a>
+  <a href="{% url 'select_data' %}">Main Screen</a>
+  <a href="{% url 'logout' %}">Log Out</a>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "observations/base.html" %}
+
+{% block topnav %}
+<div class="gold-bar">
+  <a href="{% url 'reports' %}">[ My Observations ]</a>
+  <a href="{% url 'logout' %}">[ Log Out ]</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: flex-start; max-width: 800px; margin: 0 auto;">
+  <!-- Left side: person silhouette placeholder -->
+  <div style="flex: 0 0 200px; display: flex; align-items: flex-start; justify-content: center; padding-top: 20px; padding-right: 0;">
+    <div style="position: relative; width: 120px;">
+      <!-- Simple CSS person silhouette -->
+      <div style="width: 50px; height: 50px; background: #b0c8e0; border-radius: 50%; margin: 0 auto 6px;"></div>
+      <div style="width: 80px; height: 100px; background: #b0c8e0; border-radius: 40px 40px 10px 10px; margin: 0 auto;"></div>
+    </div>
+  </div>
+
+  <!-- Blue vertical divider -->
+  <div style="width: 3px; background: #7aacdb; align-self: stretch; margin: 0 20px; min-height: 200px;"></div>
+
+  <!-- Right side: SELECT DATA panel -->
+  <div style="flex: 1;">
+    <div class="select-panel">
+      <div class="select-panel-header">SELECT DATA</div>
+      <div class="select-panel-body">
+        <div class="welcome">Welcome {{ request.user.username }}!</div>
+        <form method="post" id="select-form">
+          {% csrf_token %}
+
+          <div class="form-row">
+            <label for="school_id">School:</label>
+            <select name="school_id" id="school_id" onchange="loadTeachers(this.value)" style="width: 200px;">
+              <option value="">-- Select School --</option>
+              {% for school in schools %}
+                <option value="{{ school.id }}">{{ school.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-row" id="teacher-row" style="display: none;">
+            <label for="teacher_id">Teacher:</label>
+            <select name="teacher_id" id="teacher_id" style="width: 200px;">
+              <option value="">-- Select Teacher --</option>
+            </select>
+          </div>
+
+          <button type="submit" class="enter-btn">ENTER</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function loadTeachers(schoolId) {
+    var teacherRow = document.getElementById('teacher-row');
+    var teacherSelect = document.getElementById('teacher_id');
+
+    if (!schoolId) {
+        teacherRow.style.display = 'none';
+        teacherSelect.innerHTML = '<option value="">-- Select Teacher --</option>';
+        return;
+    }
+
+    fetch('/api/teachers/?school_id=' + schoolId)
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            teacherSelect.innerHTML = '<option value="">-- Select Teacher --</option>';
+            data.teachers.forEach(function(teacher) {
+                var option = document.createElement('option');
+                option.value = teacher.id;
+                option.textContent = teacher.name + ' (' + teacher.teacher_id + ')';
+                teacherSelect.appendChild(option);
+            });
+            teacherRow.style.display = 'flex';
+        })
+        .catch(function(err) {
+            console.error('Error loading teachers:', err);
+        });
+}
+</script>
+{% endblock %}
+
+{% block footer %}
+  <a href="{% url 'reports' %}">Reports</a>
+  <a href="{% url 'logout' %}">Log Out</a>
+{% endblock %}
