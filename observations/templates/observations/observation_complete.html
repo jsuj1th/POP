@@ -1,52 +1,93 @@
 {% extends "observations/base.html" %}
 
-{% block topnav %}
-<div class="gold-bar">
-  <a href="{% url 'select_data' %}">Return to Main Screen</a>
-  <a href="{% url 'logout' %}">Log Out</a>
-</div>
+{% block page_title %}Observation Complete{% endblock %}
+{% block heading_text %}Observation Complete{% endblock %}
+
+{% block nav_items %}
+  <a href="{% url 'select_data' %}" class="nav-link">Main Screen</a>
+  <a href="{% url 'logout' %}" class="nav-link">Log Out</a>
 {% endblock %}
 
-{% block page_title %}OBSERVATION COMPLETE{% endblock %}
-
 {% block content %}
-<div class="completion-box">
-  <div class="completion-box-header">OBSERVATION SESSION COMPLETE</div>
-  <div class="completion-box-body">
-    <p><strong>{{ teacher.name }}</strong></p>
-    <p>{{ count }} observation{{ count|pluralize }} recorded successfully.</p>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-10 col-lg-8">
 
-    <table style="width:100%; font-size:13px; border-collapse:collapse; margin-bottom:20px; text-align:left;">
-      <thead>
-        <tr>
-          <th style="background:#7090b0; color:white; padding:5px 8px;">#</th>
-          <th style="background:#7090b0; color:white; padding:5px 8px;">ESL Strategy</th>
-          <th style="background:#7090b0; color:white; padding:5px 8px;">Curriculum</th>
-          <th style="background:#7090b0; color:white; padding:5px 8px;">Mode</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for obs in observations %}
-        <tr style="{% if forloop.counter|divisibleby:2 %}background:#f5f5f5;{% endif %}">
-          <td style="padding:4px 8px;">{{ obs.observation_number }}</td>
-          <td style="padding:4px 8px;">{{ obs.esl_strategy }}</td>
-          <td style="padding:4px 8px;">{{ obs.curriculum }}</td>
-          <td style="padding:4px 8px;">{{ obs.mode }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="card tamu-card"
+         role="region"
+         aria-labelledby="complete-heading">
 
-    <a href="{% url 'download_teacher_excel' %}?teacher_id={{ teacher.id }}" class="download-btn">
-      &#11015; Download Excel
-    </a>
-    <br><br>
-    <a href="{% url 'select_data' %}" style="font-size:13px; color:#555;">Start New Observation</a>
+      <div class="card-header text-center py-3" id="complete-heading">
+        Observation Session Complete
+      </div>
+
+      <div class="card-body p-4">
+
+        {# Teacher summary #}
+        <p class="text-center mb-1"
+           style="font-family:var(--font-headline); font-weight:700;
+                  font-size:1.1rem; color:var(--tamu-maroon);">
+          {{ teacher.name }}
+        </p>
+        <p class="text-center mb-4"
+           style="color:var(--tamu-gray); font-size:0.9rem;">
+          <span aria-label="{{ count }} observation{{ count|pluralize }} recorded successfully">
+            {{ count }} observation{{ count|pluralize }} recorded successfully.
+          </span>
+        </p>
+
+        {# Summary table #}
+        <div class="table-responsive mb-4">
+          <table class="table tamu-table table-bordered"
+                 aria-label="Summary of recorded observations for {{ teacher.name }}">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">ESL Strategy</th>
+                <th scope="col">Curriculum</th>
+                <th scope="col">Mode</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for obs in observations %}
+              <tr>
+                <td>{{ obs.observation_number }}</td>
+                <td>{{ obs.esl_strategy }}</td>
+                <td>{{ obs.curriculum }}</td>
+                <td>{{ obs.mode }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted">
+                  No observations to display.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        {# Action buttons #}
+        <div class="d-flex flex-column align-items-center gap-3">
+          <a href="{% url 'download_teacher_excel' %}?teacher_id={{ teacher.id }}"
+             class="btn btn-tamu px-4"
+             aria-label="Download Excel file for {{ teacher.name }}">
+            &#11015;&nbsp; Download Excel
+          </a>
+          <a href="{% url 'select_data' %}"
+             class="tamu-link"
+             style="font-size:0.875rem;">
+            Start New Observation
+          </a>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </div>
 {% endblock %}
 
-{% block footer %}
-  <a href="{% url 'select_data' %}">Return to Main Screen</a>
+{% block footer_links %}
+  <a href="{% url 'select_data' %}">Main Screen</a>
   <a href="{% url 'logout' %}">Log Out</a>
 {% endblock %}

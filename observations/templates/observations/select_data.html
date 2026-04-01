@@ -1,90 +1,151 @@
 {% extends "observations/base.html" %}
 
-{% block topnav %}
-<div class="gold-bar">
-  <a href="{% url 'reports' %}">[ My Observations ]</a>
-  <a href="{% url 'logout' %}">[ Log Out ]</a>
-</div>
+{% block page_title %}Select Data{% endblock %}
+{% block heading_text %}Select Data{% endblock %}
+
+{% block nav_items %}
+  <a href="{% url 'reports' %}" class="nav-link">My Observations</a>
+  <a href="{% url 'logout' %}" class="nav-link">Log Out</a>
 {% endblock %}
 
 {% block content %}
-<div style="display: flex; align-items: flex-start; max-width: 800px; margin: 0 auto;">
-  <!-- Left side: person silhouette placeholder -->
-  <div style="flex: 0 0 200px; display: flex; align-items: flex-start; justify-content: center; padding-top: 20px; padding-right: 0;">
-    <div style="position: relative; width: 120px;">
-      <!-- Simple CSS person silhouette -->
-      <div style="width: 50px; height: 50px; background: #b0c8e0; border-radius: 50%; margin: 0 auto 6px;"></div>
-      <div style="width: 80px; height: 100px; background: #b0c8e0; border-radius: 40px 40px 10px 10px; margin: 0 auto;"></div>
-    </div>
-  </div>
+<div class="row justify-content-center">
+  <div class="col-12 col-sm-10 col-md-7 col-lg-5">
 
-  <!-- Blue vertical divider -->
-  <div style="width: 3px; background: #7aacdb; align-self: stretch; margin: 0 20px; min-height: 200px;"></div>
+    <div class="card tamu-card" role="region" aria-labelledby="select-heading">
+      <div class="card-header text-center py-3" id="select-heading">
+        Select Data
+      </div>
+      <div class="card-body p-4">
 
-  <!-- Right side: SELECT DATA panel -->
-  <div style="flex: 1;">
-    <div class="select-panel">
-      <div class="select-panel-header">SELECT DATA</div>
-      <div class="select-panel-body">
-        <div class="welcome">Welcome {{ request.user.username }}!</div>
-        <form method="post" id="select-form">
+        <p class="text-center mb-4"
+           style="font-family:var(--font-headline); font-weight:700; color:var(--tamu-maroon);">
+          Welcome, {{ request.user.username }}!
+        </p>
+
+        <form method="post" id="select-form" novalidate>
           {% csrf_token %}
 
-          <div class="form-row">
-            <label for="school_id">School:</label>
-            <select name="school_id" id="school_id" onchange="loadTeachers(this.value)" style="width: 200px;">
-              <option value="">-- Select School --</option>
+          <!-- School selector -->
+          <div class="mb-3">
+            <label for="school_id" class="form-label">
+              School
+              <span class="text-required" aria-hidden="true">*</span>
+              <span class="visually-hidden">(required)</span>
+            </label>
+            <select name="school_id"
+                    id="school_id"
+                    class="form-select tamu-select"
+                    required
+                    aria-required="true"
+                    aria-describedby="school-hint"
+                    onchange="loadTeachers(this.value)">
+              <option value="">— Select School —</option>
               {% for school in schools %}
                 <option value="{{ school.id }}">{{ school.name }}</option>
               {% endfor %}
             </select>
+            <div id="school-hint" class="form-text" style="color:var(--tamu-gray);">
+              Choose a school to load its teachers.
+            </div>
           </div>
 
-          <div class="form-row" id="teacher-row" style="display: none;">
-            <label for="teacher_id">Teacher:</label>
-            <select name="teacher_id" id="teacher_id" style="width: 200px;">
-              <option value="">-- Select Teacher --</option>
+          <!-- Teacher selector (revealed after school is chosen) -->
+          <div class="mb-4"
+               id="teacher-row"
+               style="display:none;"
+               aria-hidden="true">
+            <label for="teacher_id" class="form-label">
+              Teacher
+              <span class="text-required" aria-hidden="true">*</span>
+              <span class="visually-hidden">(required)</span>
+            </label>
+            <select name="teacher_id"
+                    id="teacher_id"
+                    class="form-select tamu-select"
+                    required
+                    aria-required="true">
+              <option value="">— Select Teacher —</option>
             </select>
           </div>
 
-          <button type="submit" class="enter-btn">ENTER</button>
+          <!-- Loading indicator (hidden until fetch is in flight) -->
+          <div id="teacher-loading"
+               class="mb-3 small text-center"
+               style="display:none; color:var(--tamu-gray);"
+               role="status"
+               aria-live="polite">
+            Loading teachers&hellip;
+          </div>
+
+          <!-- Error message for fetch failures -->
+          <div id="teacher-error"
+               class="tamu-alert tamu-alert-error mb-3"
+               style="display:none;"
+               role="alert"
+               aria-live="assertive">
+            Could not load teachers. Please try again.
+          </div>
+
+          <div class="d-grid mt-2">
+            <button type="submit" class="btn btn-tamu">Enter</button>
+          </div>
         </form>
+
       </div>
     </div>
+
   </div>
 </div>
 
+{% block extra_scripts %}
 <script>
 function loadTeachers(schoolId) {
-    var teacherRow = document.getElementById('teacher-row');
-    var teacherSelect = document.getElementById('teacher_id');
+  var teacherRow     = document.getElementById('teacher-row');
+  var teacherSelect  = document.getElementById('teacher_id');
+  var loadingMsg     = document.getElementById('teacher-loading');
+  var errorMsg       = document.getElementById('teacher-error');
 
-    if (!schoolId) {
-        teacherRow.style.display = 'none';
-        teacherSelect.innerHTML = '<option value="">-- Select Teacher --</option>';
-        return;
-    }
+  // Reset state
+  teacherRow.style.display = 'none';
+  teacherRow.setAttribute('aria-hidden', 'true');
+  errorMsg.style.display = 'none';
+  teacherSelect.innerHTML = '<option value="">— Select Teacher —</option>';
 
-    fetch('/api/teachers/?school_id=' + schoolId)
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            teacherSelect.innerHTML = '<option value="">-- Select Teacher --</option>';
-            data.teachers.forEach(function(teacher) {
-                var option = document.createElement('option');
-                option.value = teacher.id;
-                option.textContent = teacher.name + ' (' + teacher.teacher_id + ')';
-                teacherSelect.appendChild(option);
-            });
-            teacherRow.style.display = 'flex';
-        })
-        .catch(function(err) {
-            console.error('Error loading teachers:', err);
-        });
+  if (!schoolId) return;
+
+  loadingMsg.style.display = 'block';
+
+  fetch('/api/teachers/?school_id=' + encodeURIComponent(schoolId))
+    .then(function(r) {
+      if (!r.ok) throw new Error('Network response was not ok');
+      return r.json();
+    })
+    .then(function(data) {
+      loadingMsg.style.display = 'none';
+
+      data.teachers.forEach(function(t) {
+        var opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = t.name + ' (' + t.teacher_id + ')';
+        teacherSelect.appendChild(opt);
+      });
+
+      teacherRow.style.display = '';
+      teacherRow.removeAttribute('aria-hidden');
+      teacherSelect.focus();
+    })
+    .catch(function() {
+      loadingMsg.style.display = 'none';
+      errorMsg.style.display = 'block';
+    });
 }
 </script>
 {% endblock %}
 
-{% block footer %}
+{% endblock %}
+
+{% block footer_links %}
   <a href="{% url 'reports' %}">Reports</a>
   <a href="{% url 'logout' %}">Log Out</a>
 {% endblock %}
