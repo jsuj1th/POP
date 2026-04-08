@@ -28,10 +28,10 @@
     <nav class="navbar navbar-expand-md py-2" aria-label="Site navigation">
       <div class="container-lg px-3">
 
-        <!-- Logo -->
+        <!-- Logo: white variant (white box, maroon text) for dark navbar -->
         <a class="navbar-brand me-3 py-1" href="{% url 'select_data' %}"
            aria-label="Texas A&M University — POP Home">
-          <img src="https://aux.tamu.edu/logos/boxTAM.svg"
+          <img src="{% static 'observations/img/logo-white.svg' %}"
                alt="Texas A&M University"
                height="44">
         </a>
@@ -92,7 +92,8 @@
       <div class="d-flex flex-wrap align-items-start justify-content-between gap-4">
 
         <div>
-          <img src="https://aux.tamu.edu/logos/boxTAM.svg"
+          <!-- Footer also on dark background — use white variant -->
+          <img src="{% static 'observations/img/logo-white.svg' %}"
                alt="Texas A&M University"
                class="d-block mb-2">
           <p>© 2026 Texas A&amp;M University. All rights reserved.</p>
@@ -110,7 +111,7 @@
 
   <!-- Bootstrap 5 JS bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmE+A+I7pJD4EFv4Bm9C2M6d+A"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
           crossorigin="anonymous"></script>
 
   {% block extra_scripts %}{% endblock %}

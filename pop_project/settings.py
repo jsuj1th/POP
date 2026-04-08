@@ -1,12 +1,14 @@
 from pathlib import Path
+import os
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-pop-dev-key-change-in-production'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-pop-dev-key-change-in-production')
 
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -15,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'mozilla_django_oidc',
     'observations',
 ]
 
@@ -74,3 +77,38 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
+
+# OIDC Configuration for TAMU Login
+AUTHENTICATION_BACKENDS = [
+    'observations.auth.TAMUOIDCAuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',  # Keep default auth as fallback
+]
+
+# OIDC Settings for TAMU (Microsoft Azure AD)
+OIDC_RP_CLIENT_ID = config('OIDC_RP_CLIENT_ID', default='')
+OIDC_RP_CLIENT_SECRET = config('OIDC_RP_CLIENT_SECRET', default='')
+OIDC_RP_SIGN_ALGO = 'RS256'
+OIDC_RP_IDP_SIGN_ALGO = 'RS256'
+
+# Required scope for OIDC
+OIDC_RP_SCOPES = config('OIDC_RP_SCOPES', default='openid profile email')
+
+# TAMU uses Azure AD, update these endpoints if needed
+OIDC_OP_AUTHORIZATION_ENDPOINT = config('OIDC_OP_AUTHORIZATION_ENDPOINT', default='https://login.microsoftonline.com/common/oauth2/v2.0/authorize')
+OIDC_OP_TOKEN_ENDPOINT = config('OIDC_OP_TOKEN_ENDPOINT', default='https://login.microsoftonline.com/common/oauth2/v2.0/token')
+OIDC_OP_USER_ENDPOINT = config('OIDC_OP_USER_ENDPOINT', default='https://graph.microsoft.com/oidc/userinfo')
+OIDC_OP_JWKS_ENDPOINT = config('OIDC_OP_JWKS_ENDPOINT', default='https://login.microsoftonline.com/common/discovery/v2.0/keys')
+
+# For development only
+OIDC_VERIFY_SSL = config('OIDC_VERIFY_SSL', default=True, cast=bool)
+
+# Allow auto-login for new users
+OIDC_CREATE_USER = True
+OIDC_UPDATE_USER = True
+
+# Allow OIDC claims to be retrieved
+OIDC_USE_NONCE = config('OIDC_USE_NONCE', default=True, cast=bool)
+OIDC_NONCE_SIZE = 32
+
+# Store tokens for later use
+OIDC_STORE_ID_TOKEN = True

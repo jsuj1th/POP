@@ -1,2 +1,6 @@
 Django>=4.2
 openpyxl>=3.1.0
+requests>=2.31.0
+authlib>=1.2.0
+python-decouple>=3.8
+mozilla-django-oidc>=3.0.0

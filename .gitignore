@@ -2,3 +2,5 @@
 venv
 VICTORY Teachers (G5).csv
 __pycache__
+.env
+.env.example

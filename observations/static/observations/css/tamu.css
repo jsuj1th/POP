@@ -58,7 +58,6 @@ body {
 
 .tamu-navbar .navbar-brand img {
   height: 44px;
-  filter: brightness(0) invert(1);
 }
 
 .tamu-navbar .app-title {
@@ -385,6 +384,11 @@ a.tamu-link {
   font-weight: 600;
   text-decoration: none;
   font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 
 a.tamu-link:hover {
@@ -436,13 +440,12 @@ a.tamu-link:focus-visible {
 
 .tamu-footer img {
   height: 36px;
-  filter: brightness(0) invert(1);
 }
 
 .tamu-footer p {
   font-family: var(--font-body);
   font-size: 0.78rem;
-  color: var(--tamu-gray);
+  color: var(--tamu-light-gray);
   margin: 0;
 }
 
@@ -467,4 +470,26 @@ a.tamu-link:focus-visible {
 .footer-divider {
   border-color: var(--tamu-dark-gray);
   opacity: 1;
+}
+
+/* ── Login Divider ────────────────────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  color: var(--tamu-gray);
+  font-size: 0.875rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--tamu-light-gray);
+}
+
+.divider-text {
+  flex-shrink: 0;
 }

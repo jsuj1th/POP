@@ -18,8 +18,7 @@
   </p>
   {% if groups %}
   <a href="{% url 'download_excel' %}"
-     class="btn btn-tamu btn-tamu-sm"
-     aria-label="Download all observations as an Excel file">
+     class="btn btn-tamu btn-tamu-sm">
     &#11015;&nbsp; Download All (Excel)
   </a>
   {% endif %}
@@ -30,7 +29,6 @@
 {# ── Observations table ── #}
 <div class="table-responsive">
   <table class="table tamu-table table-bordered"
-         role="table"
          aria-label="Observation history by teacher">
     <thead>
       <tr>
@@ -57,13 +55,14 @@
           role="button"
           tabindex="0"
           aria-expanded="false"
-          aria-controls="g{{ teacher.id }}"
-          aria-label="{{ teacher.name }} — {{ obs_list|length }} observation{{ obs_list|length|pluralize }}. Press Enter to expand.">
-        <td class="text-center" aria-hidden="true">
+          aria-controls="g{{ teacher.id }}">
+        <td class="text-center">
           <span id="icon-g{{ teacher.id }}"
-                style="color:var(--tamu-maroon); font-size:0.75rem;">
+                style="color:var(--tamu-maroon); font-size:0.75rem;"
+                aria-hidden="true">
             &#9654;
           </span>
+          <span class="visually-hidden">Press Enter to expand</span>
         </td>
         <td class="teacher-name">{{ teacher.name }}</td>
         <td>{{ school.name }}</td>
