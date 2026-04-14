@@ -8,7 +8,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-pop-dev-key-change-in
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
+ALLOWED_HOSTS = ['pop-portal.ed.tamu.edu']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
