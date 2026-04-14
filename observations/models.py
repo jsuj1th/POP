@@ -21,29 +21,41 @@ class Teacher(models.Model):
 
 
 ESL_STRATEGY_CHOICES = [
-    ('QS', 'QS'), ('TPR', 'TPR'), ('VS', 'VS'), ('MT', 'MT'), ('RP', 'RP'),
-    ('DR', 'DR'), ('WA', 'WA'), ('other', 'other'),
+    ('QS', 'QS'), ('ALS', 'ALS'), ('VS', 'VS'), ('MR', 'MR'), ('AO', 'AO'),
+    ('CG', 'CG'), ('CC', 'CC'), ('LC', 'LC'), ('IT', 'IT'), ('NA', 'NA'),
 ]
 CURRICULUM_CHOICES = [
-    ('read/lit', 'read/lit'), ('math', 'math'), ('science', 'science'),
-    ('social studies', 'social studies'), ('other', 'other'),
+    ('read/lit', 'read/lit'), ('math', 'math'), ('spell', 'spell'),
+    ('hand', 'hand'), ('science', 'science'), ('soc sci', 'soc sci'),
+    ('health', 'health'), ('PE', 'PE'), ('music', 'music'), ('art', 'art'),
+    ('lang', 'lang'), ('compos', 'compos'), ('non-ac', 'non-ac'), ('ESL', 'ESL'),
 ]
 PHYSICAL_GROUP_CHOICES = [
-    ('TC', 'TC'), ('SG', 'SG'), ('I', 'I'), ('P', 'P'),
+    ('TC', 'TC'), ('LG', 'LG'), ('SG', 'SG'), ('Pairs', 'Pairs'), ('Single', 'Single'),
 ]
 ACTIVITY_STRUCTURE_CHOICES = [
-    ('lec/lis', 'lec/lis'), ('disc', 'disc'), ('coop', 'coop'),
-    ('ind', 'ind'), ('other', 'other'),
+    ('lec/lis', 'lec/lis'), ('lec/per', 'lec/per'), ('dir/lis', 'dir/lis'),
+    ('dir/per', 'dir/per'), ('dem/lis', 'dem/lis'), ('led/per', 'led/per'),
+    ('ask/per', 'ask/per'), ('ask/ans', 'ask/ans'), ('ans/ask', 'ans/ask'),
+    ('ev/per', 'ev/per'), ('obs/per', 'obs/per'), ('ev/dis', 'ev/dis'),
+    ('ev/cop', 'ev/cop'), ('obs/dis', 'obs/dis'), ('obs/cop', 'obs/cop'),
+    ('NA/free', 'NA/free'), ('NA/feed', 'NA/feed'), ('NA/tran', 'NA/tran'),
+    ('NA/int', 'NA/int'), ('NA/out', 'NA/out'), ('interac', 'interac'),
 ]
 MODE_CHOICES = [
-    ('writing', 'writing'), ('reading', 'reading'), ('listening', 'listening'),
-    ('speaking', 'speaking'), ('multi', 'multi'),
+    ('writing', 'writing'), ('reading', 'reading'), ('aural', 'aural'),
+    ('verbal', 'verbal'), ('wr-re', 'wr-re'), ('wr-au', 'wr-au'),
+    ('wr-ver', 'wr-ver'), ('re-wr', 're-wr'), ('re-au', 're-au'),
+    ('re-ver', 're-ver'), ('au-wr', 'au-wr'), ('au-re', 'au-re'),
+    ('ver-wr', 'ver-wr'), ('ver-re', 'ver-re'), ('ver-au', 'ver-au'),
+    ('au-re-ver', 'au-re-ver'), ('NA', 'NA'), ('au-ver', 'au-ver'),
 ]
 LANGUAGE_CONTENT_CHOICES = [
-    ('social', 'social'), ('academic', 'academic'), ('both', 'both'),
+    ('social', 'social'), ('academic', 'academic'), ('light cog', 'light cog'),
+    ('dns cog', 'dns cog'), ('NA', 'NA'),
 ]
 LANGUAGE_CHOICES = [
-    ('L1', 'L1'), ('L2', 'L2'), ('both', 'both'), ('neither', 'neither'),
+    ('L1', 'L1'), ('L2', 'L2'), ('L1-2', 'L1-2'), ('L2-1', 'L2-1'), ('NA', 'NA'),
 ]
 
 
