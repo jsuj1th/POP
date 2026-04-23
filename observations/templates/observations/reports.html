@@ -10,7 +10,6 @@
 
 {% block content %}
 
-{# ── Toolbar ── #}
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
   <p class="mb-0 small" style="color:var(--tamu-gray);">
     Click a teacher row to expand observations.
@@ -26,20 +25,19 @@
 
 {% if groups %}
 
-{# ── Observations table ── #}
 <div class="table-responsive">
   <table class="table tamu-table table-bordered"
          aria-label="Observation history by teacher">
     <thead>
       <tr>
-        <th scope="col" style="width:36px;" aria-label="Expand row toggle"></th>
-        <th scope="col">Teacher</th>
-        <th scope="col">School</th>
-        <th scope="col">District</th>
-        <th scope="col">Condition</th>
-        <th scope="col" class="text-center"># Obs</th>
-        <th scope="col">Last Recorded</th>
-        <th scope="col">Download</th>
+        <th style="width:36px;"></th>
+        <th>Teacher</th>
+        <th>School</th>
+        <th>District</th>
+        <th>Condition</th>
+        <th class="text-center"># Obs</th>
+        <th>Last Recorded</th>
+        <th>Download</th>
       </tr>
     </thead>
     <tbody>
@@ -47,104 +45,76 @@
       {% for group in groups %}
       {% with obs_list=group.observations teacher=group.teacher school=group.school %}
 
-      {# ── Teacher summary row (expandable) ── #}
       <tr class="teacher-row"
-          id="row-{{ teacher.id }}"
-          onclick="toggleGroup('g{{ teacher.id }}')"
-          onkeydown="handleRowKey(event, 'g{{ teacher.id }}')"
-          role="button"
-          tabindex="0"
-          aria-expanded="false"
-          aria-controls="g{{ teacher.id }}">
+          onclick="toggleGroup('g{{ teacher.id }}')">
         <td class="text-center">
-          <span id="icon-g{{ teacher.id }}"
-                style="color:var(--tamu-maroon); font-size:0.75rem;"
-                aria-hidden="true">
+          <span id="icon-g{{ teacher.id }}">
             &#9654;
           </span>
-          <span class="visually-hidden">Press Enter to expand</span>
         </td>
         <td class="teacher-name">{{ teacher.name }}</td>
         <td>{{ school.name }}</td>
-        <td class="small" style="color:var(--tamu-gray);">{{ school.district }}</td>
-        <td class="small" style="color:var(--tamu-gray);">{{ school.condition }}</td>
+        <td>{{ school.district }}</td>
+        <td>{{ school.condition }}</td>
         <td class="text-center fw-bold">{{ obs_list|length }}</td>
-        <td class="small">
+        <td>
           {% with obs_list|last as last_obs %}
             {% if last_obs %}{{ last_obs.created_at|date:"Y-m-d" }}{% else %}—{% endif %}
           {% endwith %}
         </td>
         <td>
-          <a href="{% url 'download_teacher_excel' %}?teacher_id={{ teacher.id }}"
+          <a href="{% url 'select_session_download' %}?teacher_id={{ teacher.id }}"
              class="tamu-link"
-             onclick="event.stopPropagation()"
-             aria-label="Download Excel for {{ teacher.name }}">
-            &#11015; Excel
+             onclick="event.stopPropagation()">
+            &#11015; Sessions
           </a>
         </td>
       </tr>
 
-      {# ── Expanded observation detail rows ── #}
-      <tr id="g{{ teacher.id }}"
-          style="display:none;"
-          aria-hidden="true">
-        <td colspan="8" class="p-0">
+      <tr id="g{{ teacher.id }}" style="display:none;">
+        <td colspan="8">
 
-          <div class="table-responsive">
-            <table class="table table-sm obs-sub-table mb-0"
-                   aria-label="Individual observations for {{ teacher.name }}">
-              <thead>
-                <tr>
-                  <th scope="col" class="ps-3">Obs #</th>
-                  <th scope="col">ESL Strategy</th>
-                  <th scope="col">Curriculum</th>
-                  <th scope="col">Physical Group</th>
-                  <th scope="col">Activity Structure</th>
-                  <th scope="col">Mode</th>
-                  <th scope="col">Lang Content</th>
-                  <th scope="col">Lang Instr (T)</th>
-                  <th scope="col">Lang Instr (S)</th>
-                  <th scope="col">Date</th>
-                  <th scope="col">Edit</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for obs in obs_list %}
-                <tr>
-                  <td class="ps-3 fw-semibold"
-                      style="color:var(--tamu-maroon);">
-                    {{ obs.observation_number }}
-                  </td>
-                  <td>{{ obs.esl_strategy }}</td>
-                  <td>{{ obs.curriculum }}</td>
-                  <td>{{ obs.physical_group }}</td>
-                  <td>{{ obs.activity_structure }}</td>
-                  <td>{{ obs.mode }}</td>
-                  <td>{{ obs.language_content }}</td>
-                  <td>{{ obs.language_instruction_teacher }}</td>
-                  <td>{{ obs.language_instruction_student }}</td>
-                  <td class="text-nowrap" style="color:var(--tamu-gray);">
-                    {{ obs.created_at|date:"Y-m-d H:i" }}
-                  </td>
-                  <td>
-                    <a href="{% url 'edit_observation' obs.id %}"
-                       class="tamu-link"
-                       aria-label="Edit observation #{{ obs.observation_number }} for {{ teacher.name }}">
-                      &#9998; Edit
-                    </a>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+          <table class="table table-sm mb-0">
+            <thead>
+              <tr>
+                <th>Obs #</th>
+                <th>ESL</th>
+                <th>Curriculum</th>
+                <th>Group</th>
+                <th>Structure</th>
+                <th>Mode</th>
+                <th>Content</th>
+                <th>T</th>
+                <th>S</th>
+                <th>Date</th>
+                <th>Edit</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for obs in obs_list %}
+              <tr>
+                <td>{{ obs.observation_number }}</td>
+                <td>{{ obs.esl_strategy }}</td>
+                <td>{{ obs.curriculum }}</td>
+                <td>{{ obs.physical_group }}</td>
+                <td>{{ obs.activity_structure }}</td>
+                <td>{{ obs.mode }}</td>
+                <td>{{ obs.language_content }}</td>
+                <td>{{ obs.language_instruction_teacher }}</td>
+                <td>{{ obs.language_instruction_student }}</td>
+                <td>{{ obs.created_at|date:"Y-m-d H:i" }}</td>
+                <td>
+                  <a href="{% url 'edit_observation' obs.id %}">
+                    Edit
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
 
-          {# Add observation for this teacher #}
-          <div class="px-3 py-2 d-flex justify-content-end"
-               style="background:#faf7f5; border-top:1px solid var(--tamu-light-gray);">
-            <a href="{% url 'observation_form' %}?school_id={{ school.id }}&teacher_id={{ teacher.id }}&from=reports"
-               class="btn-tamu-sm"
-               aria-label="Add a new observation for {{ teacher.name }}">
+          <div class="text-end mt-2">
+            <a href="{% url 'observation_form' %}?school_id={{ school.id }}&teacher_id={{ teacher.id }}&from=reports">
               + Add Observation
             </a>
           </div>
@@ -161,46 +131,20 @@
 
 {% else %}
 
-{# ── Empty state ── #}
-<div class="text-center py-5"
-     role="status"
-     aria-live="polite">
-  <p class="mb-3" style="color:var(--tamu-gray);">
-    No observations recorded yet.
-  </p>
-  <a href="{% url 'select_data' %}" class="btn btn-tamu">
-    Start an Observation
-  </a>
+<div class="text-center py-5">
+  <p>No observations recorded yet.</p>
+  <a href="{% url 'select_data' %}">Start an Observation</a>
 </div>
 
 {% endif %}
 
 {% endblock %}
 
-{% block footer_links %}
-  <a href="{% url 'select_data' %}">Main Screen</a>
-  <a href="{% url 'logout' %}">Log Out</a>
-{% endblock %}
-
 {% block extra_scripts %}
 <script>
 function toggleGroup(id) {
-  var detailRow  = document.getElementById(id);
-  var icon       = document.getElementById('icon-' + id);
-  var triggerRow = document.querySelector('[aria-controls="' + id + '"]');
-  var isHidden   = detailRow.style.display === 'none' || detailRow.style.display === '';
-
-  detailRow.style.display = isHidden ? 'table-row' : 'none';
-  detailRow.setAttribute('aria-hidden', isHidden ? 'false' : 'true');
-  triggerRow.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-  icon.innerHTML = isHidden ? '&#9660;' : '&#9654;';
-}
-
-function handleRowKey(event, id) {
-  if (event.key === 'Enter' || event.key === ' ') {
-    event.preventDefault();
-    toggleGroup(id);
-  }
+  var row = document.getElementById(id);
+  row.style.display = (row.style.display === 'none') ? 'table-row' : 'none';
 }
 </script>
 {% endblock %}

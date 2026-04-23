@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class School(models.Model):
     name = models.CharField(max_length=200)
     district = models.CharField(max_length=200, blank=True)
-    condition = models.CharField(max_length=20, blank=True)  # Online / F2F
+    condition = models.CharField(max_length=20, blank=True)
 
     def __str__(self):
         return self.name
@@ -20,58 +20,77 @@ class Teacher(models.Model):
         return self.name
 
 
+class ObservationSession(models.Model):
+    observer = models.ForeignKey(User, on_delete=models.CASCADE)
+    school = models.ForeignKey(School, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.teacher.name} - Session {self.id}"
+
+
 ESL_STRATEGY_CHOICES = [
-    ('QS', 'QS'), ('ALS', 'ALS'), ('VS', 'VS'), ('MR', 'MR'), ('AO', 'AO'),
-    ('CG', 'CG'), ('CC', 'CC'), ('LC', 'LC'), ('IT', 'IT'), ('NA', 'NA'),
+    (1, 'QS'), (2, 'ALS'), (3, 'VS'), (4, 'MR'), (5, 'AO'),
+    (6, 'CG'), (7, 'CC'), (8, 'LC'), (9, 'IT'), (10, 'NA'),
 ]
+
 CURRICULUM_CHOICES = [
-    ('read/lit', 'read/lit'), ('math', 'math'), ('spell', 'spell'),
-    ('hand', 'hand'), ('science', 'science'), ('soc sci', 'soc sci'),
-    ('health', 'health'), ('PE', 'PE'), ('music', 'music'), ('art', 'art'),
-    ('lang', 'lang'), ('compos', 'compos'), ('non-ac', 'non-ac'), ('ESL', 'ESL'),
+    (1, 'read/lit'), (2, 'math'), (3, 'spell'), (4, 'hand'),
+    (5, 'science'), (6, 'soc sci'), (7, 'health'), (8, 'PE'),
+    (9, 'music'), (10, 'art'), (11, 'lang'), (12, 'compos'),
+    (13, 'non-ac'), (14, 'ESL'),
 ]
+
 PHYSICAL_GROUP_CHOICES = [
-    ('TC', 'TC'), ('LG', 'LG'), ('SG', 'SG'), ('Pairs', 'Pairs'), ('Single', 'Single'),
+    (1, 'TC'), (2, 'LG'), (3, 'SG'), (4, 'Pairs'), (5, 'Single'),
 ]
+
 ACTIVITY_STRUCTURE_CHOICES = [
-    ('lec/lis', 'lec/lis'), ('lec/per', 'lec/per'), ('dir/lis', 'dir/lis'),
-    ('dir/per', 'dir/per'), ('dem/lis', 'dem/lis'), ('led/per', 'led/per'),
-    ('ask/per', 'ask/per'), ('ask/ans', 'ask/ans'), ('ans/ask', 'ans/ask'),
-    ('ev/per', 'ev/per'), ('obs/per', 'obs/per'), ('ev/dis', 'ev/dis'),
-    ('ev/cop', 'ev/cop'), ('obs/dis', 'obs/dis'), ('obs/cop', 'obs/cop'),
-    ('NA/free', 'NA/free'), ('NA/feed', 'NA/feed'), ('NA/tran', 'NA/tran'),
-    ('NA/int', 'NA/int'), ('NA/out', 'NA/out'), ('interac', 'interac'),
+    (1, 'lec/lis'), (2, 'lec/per'), (3, 'dir/lis'), (4, 'dir/per'),
+    (5, 'dem/lis'), (6, 'led/per'), (7, 'ask/per'), (8, 'ask/ans'),
+    (9, 'ans/ask'), (10, 'ev/per'), (11, 'obs/per'), (12, 'ev/dis'),
+    (13, 'ev/cop'), (14, 'obs/dis'), (15, 'obs/cop'), (16, 'NA/free'),
+    (17, 'NA/feed'), (18, 'NA/tran'), (19, 'NA/int'), (20, 'NA/out'),
+    (21, 'interact'),
 ]
+
 MODE_CHOICES = [
-    ('writing', 'writing'), ('reading', 'reading'), ('aural', 'aural'),
-    ('verbal', 'verbal'), ('wr-re', 'wr-re'), ('wr-au', 'wr-au'),
-    ('wr-ver', 'wr-ver'), ('re-wr', 're-wr'), ('re-au', 're-au'),
-    ('re-ver', 're-ver'), ('au-wr', 'au-wr'), ('au-re', 'au-re'),
-    ('ver-wr', 'ver-wr'), ('ver-re', 'ver-re'), ('ver-au', 'ver-au'),
-    ('au-re-ver', 'au-re-ver'), ('NA', 'NA'), ('au-ver', 'au-ver'),
+    (1, 'writing'), (2, 'reading'), (3, 'aural'), (4, 'verbal'),
+    (5, 'wr-re'), (6, 'wr-au'), (7, 'wr-ver'), (8, 're-wr'),
+    (9, 're-au'), (10, 're-ver'), (11, 'au-wr'), (12, 'au-re'),
+    (13, 'ver-wr'), (14, 'ver-re'), (15, 'ver-au'),
+    (16, 'au-re-ver'), (17, 'NA'), (18, 'au-ver'),
 ]
+
 LANGUAGE_CONTENT_CHOICES = [
-    ('social', 'social'), ('academic', 'academic'), ('light cog', 'light cog'),
-    ('dns cog', 'dns cog'), ('NA', 'NA'),
+    (1, 'social'), (2, 'academic'), (3, 'light cog'),
+    (4, 'dns cog'), (5, 'NA'),
 ]
+
 LANGUAGE_CHOICES = [
-    ('L1', 'L1'), ('L2', 'L2'), ('L1-2', 'L1-2'), ('L2-1', 'L2-1'), ('NA', 'NA'),
+    (1, 'L1'), (2, 'L2'), (3, 'L1-2'), (4, 'L2-1'), (5, 'NA'),
 ]
 
 
 class Observation(models.Model):
+    
+    session = models.ForeignKey(ObservationSession, on_delete=models.CASCADE)
+
     observer = models.ForeignKey(User, on_delete=models.CASCADE)
     school = models.ForeignKey(School, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     observation_number = models.PositiveIntegerField(default=1)
-    esl_strategy = models.CharField(max_length=20, choices=ESL_STRATEGY_CHOICES)
-    curriculum = models.CharField(max_length=50, choices=CURRICULUM_CHOICES)
-    physical_group = models.CharField(max_length=20, choices=PHYSICAL_GROUP_CHOICES)
-    activity_structure = models.CharField(max_length=20, choices=ACTIVITY_STRUCTURE_CHOICES)
-    mode = models.CharField(max_length=20, choices=MODE_CHOICES)
-    language_content = models.CharField(max_length=20, choices=LANGUAGE_CONTENT_CHOICES)
-    language_instruction_teacher = models.CharField(max_length=20, choices=LANGUAGE_CHOICES)
-    language_instruction_student = models.CharField(max_length=20, choices=LANGUAGE_CHOICES)
+
+    esl_strategy = models.IntegerField(choices=ESL_STRATEGY_CHOICES)
+    curriculum = models.IntegerField(choices=CURRICULUM_CHOICES)
+    physical_group = models.IntegerField(choices=PHYSICAL_GROUP_CHOICES)
+    activity_structure = models.IntegerField(choices=ACTIVITY_STRUCTURE_CHOICES)
+    mode = models.IntegerField(choices=MODE_CHOICES)
+    language_content = models.IntegerField(choices=LANGUAGE_CONTENT_CHOICES)
+    language_instruction_teacher = models.IntegerField(choices=LANGUAGE_CHOICES)
+    language_instruction_student = models.IntegerField(choices=LANGUAGE_CHOICES)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

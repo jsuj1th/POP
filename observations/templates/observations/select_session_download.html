@@ -1,0 +1,29 @@
+{% extends "observations/base.html" %}
+
+{% block content %}
+
+<h2>Select Session to Download</h2>
+
+<p><strong>Teacher:</strong> {{ teacher.name }}</p>
+
+{% if sessions %}
+  <ul>
+    {% for session in sessions %}
+      <li style="margin-bottom:10px;">
+        Session {{ session.id }} - {{ session.created_at|date:"Y-m-d H:i" }}
+
+        <a href="/observe/download/?session_id={{ session.id }}"
+           class="btn btn-sm btn-primary"
+           style="margin-left:10px;">
+          Download
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No sessions found.</p>
+{% endif %}
+
+<a href="{% url 'reports' %}">Back to Reports</a>
+
+{% endblock %}

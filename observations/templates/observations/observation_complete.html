@@ -9,85 +9,61 @@
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-12 col-md-10 col-lg-8">
 
-    <div class="card tamu-card"
-         role="region"
-         aria-labelledby="complete-heading">
-
-      <div class="card-header text-center py-3" id="complete-heading">
-        Observation Session Complete
-      </div>
-
-      <div class="card-body p-4">
-
-        {# Teacher summary #}
-        <p class="text-center mb-1"
-           style="font-family:var(--font-headline); font-weight:700;
-                  font-size:1.1rem; color:var(--tamu-maroon);">
-          {{ teacher.name }}
-        </p>
-        <p class="text-center mb-4"
-           style="color:var(--tamu-gray); font-size:0.9rem;">
-          <span aria-label="{{ count }} observation{{ count|pluralize }} recorded successfully">
-            {{ count }} observation{{ count|pluralize }} recorded successfully.
-          </span>
-        </p>
-
-        {# Summary table #}
-        <div class="table-responsive mb-4">
-          <table class="table tamu-table table-bordered"
-                 aria-label="Summary of recorded observations for {{ teacher.name }}">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">ESL Strategy</th>
-                <th scope="col">Curriculum</th>
-                <th scope="col">Mode</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for obs in observations %}
-              <tr>
-                <td>{{ obs.observation_number }}</td>
-                <td>{{ obs.esl_strategy }}</td>
-                <td>{{ obs.curriculum }}</td>
-                <td>{{ obs.mode }}</td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="4" class="text-center text-muted">
-                  No observations to display.
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-
-        {# Action buttons #}
-        <div class="d-flex flex-column align-items-center gap-3">
-          <a href="{% url 'download_teacher_excel' %}?teacher_id={{ teacher.id }}"
-             class="btn btn-tamu px-4"
-             aria-label="Download Excel file for {{ teacher.name }}">
-            &#11015;&nbsp; Download Excel
-          </a>
-          <a href="{% url 'select_data' %}"
-             class="tamu-link"
-             style="font-size:0.875rem;">
-            Start New Observation
-          </a>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
+<div class="text-center mb-4">
+  <h4>Session Completed</h4>
+  <p>
+    <strong>Teacher:</strong> {{ teacher.name }}<br>
+    <strong>Total Observations:</strong> {{ count }}
+  </p>
 </div>
-{% endblock %}
 
-{% block footer_links %}
-  <a href="{% url 'select_data' %}">Main Screen</a>
-  <a href="{% url 'logout' %}">Log Out</a>
+<div class="d-flex justify-content-center gap-3 mb-4">
+  <a href="{% url 'download_teacher_excel' %}?session_id={{ session_id }}"
+     class="btn btn-tamu">
+    &#11015; Download Excel
+  </a>
+
+  <a href="{% url 'select_data' %}" class="btn btn-secondary">
+    New Observation
+  </a>
+</div>
+
+{% if observations %}
+<div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Obs #</th>
+        <th>ESL Strategy</th>
+        <th>Curriculum</th>
+        <th>Physical Group</th>
+        <th>Activity Structure</th>
+        <th>Mode</th>
+        <th>Language Content</th>
+        <th>Lang Instr (T)</th>
+        <th>Lang Instr (S)</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for obs in observations %}
+      <tr>
+        <td>{{ obs.observation_number }}</td>
+        <td>{{ obs.esl_strategy }}</td>
+        <td>{{ obs.curriculum }}</td>
+        <td>{{ obs.physical_group }}</td>
+        <td>{{ obs.activity_structure }}</td>
+        <td>{{ obs.mode }}</td>
+        <td>{{ obs.language_content }}</td>
+        <td>{{ obs.language_instruction_teacher }}</td>
+        <td>{{ obs.language_instruction_student }}</td>
+        <td>{{ obs.created_at|date:"Y-m-d H:i" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
 {% endblock %}
