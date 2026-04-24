@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_GET
 import openpyxl
-from openpyxl.styles import Font, PatternFill, Alignment
 
 from .models import School, Teacher, Observation, ObservationSession
 from .forms import ObservationForm
@@ -76,6 +75,7 @@ def get_teachers(request):
 def observation_form(request):
     school_id = request.GET.get('school_id') or request.POST.get('school_id')
     teacher_id = request.GET.get('teacher_id') or request.POST.get('teacher_id')
+    session_id = request.GET.get('session_id') or request.POST.get('session_id')
     from_reports = request.GET.get('from') == 'reports' or request.POST.get('from_reports') == '1'
 
     if not school_id or not teacher_id:
@@ -85,31 +85,40 @@ def observation_form(request):
     school = get_object_or_404(School, pk=school_id)
     teacher = get_object_or_404(Teacher, pk=teacher_id, school=school)
 
-    session = ObservationSession.objects.filter(
-        observer=request.user,
-        teacher=teacher
-    ).order_by('-created_at').first()
+    if session_id and not from_reports:
+        # session_id in URL from a mid-session redirect — only reuse if still open
+        session = get_object_or_404(ObservationSession, pk=session_id, observer=request.user, teacher=teacher)
+        if session.completed:
+            # Session was completed; fall through to find/create a fresh one
+            session = None
+    elif session_id and from_reports:
+        # Coming from reports — target a specific session regardless of status
+        session = get_object_or_404(ObservationSession, pk=session_id, observer=request.user, teacher=teacher)
+    else:
+        session = None
 
-    if session:
-        count = Observation.objects.filter(session=session).count()
-        if count >= 60:
+    if session is None:
+        # Resume the most recent uncompleted session, or start a new one
+        session = ObservationSession.objects.filter(
+            observer=request.user,
+            teacher=teacher,
+            completed=False,
+        ).order_by('-created_at').first()
+
+        if not session:
             session = ObservationSession.objects.create(
                 observer=request.user,
                 school=school,
-                teacher=teacher
+                teacher=teacher,
             )
-    else:
-        session = ObservationSession.objects.create(
-            observer=request.user,
-            school=school,
-            teacher=teacher
-        )
 
     existing_count = Observation.objects.filter(session=session).count()
 
     if existing_count >= 60:
-        messages.warning(request, 'Maximum of 60 observations reached for this session.')
-        return redirect(f'/observe/complete/?session_id={session.id}')
+        session.completed = True
+        session.save()
+        messages.warning(request, 'Maximum of 60 observations reached. Starting a new session.')
+        return redirect(f'/observe/?school_id={school_id}&teacher_id={teacher_id}')
 
     observation_number = existing_count + 1
 
@@ -117,6 +126,8 @@ def observation_form(request):
         action = request.POST.get('action', 'enter')
 
         if action == 'complete':
+            session.completed = True
+            session.save()
             return redirect(f'/observe/complete/?session_id={session.id}')
 
         form = ObservationForm(request.POST)
@@ -140,7 +151,7 @@ def observation_form(request):
                 messages.success(request, f'Observation #{obs.observation_number} for {teacher.name} added.')
                 return redirect('reports')
 
-            return redirect(f'/observe/?school_id={school_id}&teacher_id={teacher_id}')
+            return redirect(f'/observe/?school_id={school_id}&teacher_id={teacher_id}&session_id={session.id}')
 
     else:
         form = ObservationForm()
@@ -152,6 +163,7 @@ def observation_form(request):
         'observation_number': observation_number,
         'school_id': school_id,
         'teacher_id': teacher_id,
+        'session_id': session.id,
         'from_reports': from_reports,
     })
 

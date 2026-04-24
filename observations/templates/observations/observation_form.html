@@ -8,14 +8,14 @@
   <a href="{% url 'logout' %}" class="nav-link">Log Out</a>
 
   <form method="post"
-        action="{% url 'observation_form' %}?school_id={{ school_id }}&teacher_id={{ teacher_id }}"
+        action="{% url 'observation_form' %}?school_id={{ school_id }}&teacher_id={{ teacher_id }}&session_id={{ session_id }}"
         id="complete-form"
         aria-label="End this observation session">
     {% csrf_token %}
     <input type="hidden" name="action" value="complete">
     <button type="button"
             class="btn btn-complete ms-1"
-            onclick="confirmComplete()"
+            onclick="document.getElementById('complete-form').submit()"
             aria-label="Mark observation session as completed and go to download page">
       &#10003; Mark as Completed
     </button>
@@ -48,7 +48,7 @@
 
 {# ── Observation entry form ── #}
 <form method="post"
-      action="{% url 'observation_form' %}?school_id={{ school_id }}&teacher_id={{ teacher_id }}{% if from_reports %}&from=reports{% endif %}"
+      action="{% url 'observation_form' %}?school_id={{ school_id }}&teacher_id={{ teacher_id }}&session_id={{ session_id }}{% if from_reports %}&from=reports{% endif %}"
       id="obs-form"
       aria-label="Observation entry form"
       novalidate>
@@ -199,18 +199,4 @@
 {% block footer_links %}
   <a href="{% url 'select_data' %}">Main Screen</a>
   <a href="{% url 'logout' %}">Log Out</a>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-function confirmComplete() {
-  if (confirm(
-    "End this observation session?\n\n" +
-    "The current (unsaved) form will be discarded.\n" +
-    "All previously saved observations will be kept."
-  )) {
-    document.getElementById('complete-form').submit();
-  }
-}
-</script>
 {% endblock %}

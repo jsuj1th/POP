@@ -36,7 +36,7 @@
         <th>District</th>
         <th>Condition</th>
         <th class="text-center"># Obs</th>
-        <th>Last Recorded</th>
+        <th>Session Date</th>
         <th>Download</th>
       </tr>
     </thead>
@@ -46,9 +46,9 @@
       {% with obs_list=group.observations teacher=group.teacher school=group.school %}
 
       <tr class="teacher-row"
-          onclick="toggleGroup('g{{ teacher.id }}')">
+          onclick="toggleGroup('g{{ group.session.id }}')">
         <td class="text-center">
-          <span id="icon-g{{ teacher.id }}">
+          <span id="icon-g{{ group.session.id }}">
             &#9654;
           </span>
         </td>
@@ -57,11 +57,7 @@
         <td>{{ school.district }}</td>
         <td>{{ school.condition }}</td>
         <td class="text-center fw-bold">{{ obs_list|length }}</td>
-        <td>
-          {% with obs_list|last as last_obs %}
-            {% if last_obs %}{{ last_obs.created_at|date:"Y-m-d" }}{% else %}—{% endif %}
-          {% endwith %}
-        </td>
+        <td>{{ group.session.created_at|date:"Y-m-d" }}</td>
         <td>
           <a href="{% url 'select_session_download' %}?teacher_id={{ teacher.id }}"
              class="tamu-link"
@@ -71,7 +67,7 @@
         </td>
       </tr>
 
-      <tr id="g{{ teacher.id }}" style="display:none;">
+      <tr id="g{{ group.session.id }}" style="display:none;">
         <td colspan="8">
 
           <table class="table table-sm mb-0">
@@ -114,7 +110,7 @@
           </table>
 
           <div class="text-end mt-2">
-            <a href="{% url 'observation_form' %}?school_id={{ school.id }}&teacher_id={{ teacher.id }}&from=reports">
+            <a href="{% url 'observation_form' %}?school_id={{ school.id }}&teacher_id={{ teacher.id }}&session_id={{ group.session.id }}&from=reports">
               + Add Observation
             </a>
           </div>
